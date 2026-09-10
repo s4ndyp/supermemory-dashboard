@@ -13,12 +13,8 @@ function extract(r: SearchResp): SearchResult[] {
   return r.results ?? r.matches ?? r.documents ?? []
 }
 
-type Mode = 'hybrid' | 'memories' | 'documents'
-const MODES: Mode[] = ['hybrid', 'memories', 'documents']
-
 export default function Search() {
   const [q, setQ] = useState('')
-  const [mode, setMode] = useState<Mode>('hybrid')
   const [results, setResults] = useState<SearchResult[] | null>(null)
   const [meta, setMeta] = useState<{ total?: number; timing?: number } | null>(null)
   const [err, setErr] = useState('')
@@ -28,9 +24,9 @@ export default function Search() {
     e.preventDefault()
     setErr(''); setResults(null); setMeta(null); setLoading(true)
     try {
-      const r = await api<SearchResp>('/v4/search', {
+      const r = await api<SearchResp>('/v3/search', {
         method: 'POST',
-        body: JSON.stringify({ q, searchMode: mode, limit: 20 }),
+        body: JSON.stringify({ q, limit: 20 }),
       })
       setResults(extract(r))
       if (!Array.isArray(r)) setMeta({ total: r.total, timing: r.timing })
@@ -54,23 +50,9 @@ export default function Search() {
             className={`${input} pl-9`}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-md border border-[--border] bg-[--input] p-0.5">
-            {MODES.map((m) => (
-              <button
-                key={m} type="button" onClick={() => setMode(m)}
-                className={`rounded-sm px-2.5 py-1 text-[12px] font-medium capitalize transition-all duration-150 ${
-                  mode === m
-                    ? 'bg-[--surface] text-[--fg] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_1px_3px_rgba(0,0,0,0.35)]'
-                    : 'text-[--fg-3] hover:text-[--fg]'
-                }`}
-              >{m}</button>
-            ))}
-          </div>
-          <button type="submit" className={btnPrimary} disabled={loading}>
-            {loading ? <Loader2 className="size-4 animate-spin" /> : <><SearchIcon className="size-4" />Search</>}
-          </button>
-        </div>
+        <button type="submit" className={btnPrimary} disabled={loading}>
+          {loading ? <Loader2 className="size-4 animate-spin" /> : <><SearchIcon className="size-4" />Search</>}
+        </button>
       </form>
 
       {meta && (
@@ -88,7 +70,7 @@ export default function Search() {
       <div className="flex flex-col gap-3">
         {results && results.map((r, i) => {
           const { id, title, type } = docFromSearchResult(r)
-          const snippet = r.memory ?? r.chunk ?? r.content ?? r.summary ?? ''
+          const snippet = r.memory ?? r.chunk ?? r.content ?? r.summary ?? r.chunks?.[0]?.content ?? ''
           const score = r.similarity ?? r.score
           const accent = typeAccent(type)
           return (

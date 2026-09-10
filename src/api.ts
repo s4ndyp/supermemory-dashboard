@@ -55,19 +55,26 @@ export type DocSummary = {
   containerTags?: string[]
 }
 
-/** v4 search response item (memory/chunk-level, with parent doc(s)). */
+/** v3/v4 search response item. v3 puts matched text in chunks[]; v4 in chunk/memory/content. */
 export type SearchResult = {
-  id?: string           // chunk / memory id — NOT the document id
-  documentId?: string   // sometimes present
+  id?: string           // chunk / memory id (v4)
+  documentId?: string   // document id (v3)
   customId?: string
-  title?: string        // rare at top level
+  title?: string
+  type?: string         // v3: top-level; v4: inside documents[]
   content?: string
-  chunk?: string        // the matching text on hybrid/documents mode
+  chunk?: string        // v4 hybrid/documents mode
   summary?: string
-  memory?: string       // the memory text on memories mode
+  memory?: string       // v4 memories mode
   score?: number
   similarity?: number
-  documents?: Array<{
+  chunks?: Array<{      // v3: matched text segments
+    content: string
+    position?: number
+    isRelevant?: boolean
+    score?: number
+  }>
+  documents?: Array<{   // v4: parent docs
     id: string
     title?: string | null
     type?: string
@@ -76,10 +83,11 @@ export type SearchResult = {
   }>
 }
 
-/** Resolve the actual document id + display title from a search result. */
+/** Resolve document id, display title, and type from a v3 or v4 search result. */
 export function docFromSearchResult(r: SearchResult): { id: string; title: string; type?: string } {
   const parent = r.documents?.[0]
   const id = parent?.id ?? r.documentId ?? r.id ?? r.customId ?? ''
   const title = parent?.title ?? r.title ?? r.customId ?? id ?? '(untitled)'
-  return { id, title, type: parent?.type }
+  const type = parent?.type ?? r.type
+  return { id, title, type }
 }

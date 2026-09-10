@@ -12,13 +12,23 @@ an API on `localhost:6767` and no UI to explore it. This project is that UI.
 
 - **Memories** — grid view with type-icons, container-tag filter chips, "Load more" pagination, per-card status.
 - **Memory graph** — 2D force-directed graph via [`@supermemory/memory-graph`](https://www.npmjs.com/package/@supermemory/memory-graph); click a node to jump to its detail page.
-- **Semantic search** — hits `/v4/search` with hybrid / memories / documents modes; result cards link to their parent document (not the chunk id).
+- **Semantic search** — hits `/v3/search`; result cards show the matched snippet and link to the parent document.
 - **⌘K palette** — global command bar; type to search memories, or pick a navigation shortcut. Native `<dialog>` for focus trap + ESC.
 - **Add memory** — text, URL, or file upload (`multipart/form-data`), with optional `containerTag`.
 - **Detail view** — inline title edit (`PATCH /v3/documents/:id`), copy-id, open-source-link and open-file-link buttons, raw-JSON expander, styled delete confirmation.
 - **Settings** — backend URL + API key, stored in `localStorage`.
 - **Design system** — mirrors upstream's DM Sans + neumorphic card language (see [`design.md`](./design.md)).
 - **Zero framework backend** — pure client-side SPA, static-hostable, talks straight to the supermemory API.
+
+## Screenshots
+
+| Memories | Search | Memory graph |
+|---|---|---|
+| ![Memories list](screenshots/list.webp) | ![Search](screenshots/search.webp) | ![Memory graph](screenshots/graph.webp) |
+
+| Add memory | Detail view | Settings |
+|---|---|---|
+| ![Add](screenshots/add.webp) | ![Detail](screenshots/detail.webp) | ![Settings](screenshots/settings.webp) |
 
 ## Quickstart
 
@@ -89,7 +99,7 @@ Cloudflare Pages, GitHub Pages, an nginx container, or `docker run -p 80:80 ngin
 | `/v3/documents/:id/file-url` | GET | Presigned URL for uploaded files |
 | `/v3/documents` | POST | Add text or URL |
 | `/v3/documents/file` | POST | Add file (multipart) |
-| `/v4/search` | POST | Hybrid / memories / documents search |
+| `/v3/search` | POST | Semantic search |
 
 ## Project layout
 
@@ -105,7 +115,7 @@ src/
 └── pages/
     ├── List.tsx      /            memory grid
     ├── Graph.tsx     /graph       memory graph
-    ├── Search.tsx    /search      /v4/search
+    ├── Search.tsx    /search      /v3/search
     ├── Add.tsx       /add         ingest text / URL / file
     ├── Detail.tsx    /doc/:id     detail + edit + delete
     └── Settings.tsx  /settings    backend URL + API key

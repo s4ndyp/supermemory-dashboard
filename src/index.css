@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Bespoke hex palette from apps/web pre-removal (see design.md) */
+:root {
+  --bg: #05080D;
+  --bg-elevated: #0A0E14;
+  --surface: #1B1F24;
+  --surface-2: #0F1217;
+  --input: #14161A;
+
+  --fg: #FAFAFA;
+  --fg-2: #A1A1AA;
+  --fg-3: #737373;
+  --fg-4: #525D6E;
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+
+  --accent-blue: #4BA0FA;
+  --accent-orange: #FF8A47;
+  --accent-green: #10A37F;
+  --accent-purple: #B19CFF;
+
+  --radius-card: 16px;
+  --radius-modal: 22px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-input: var(--input);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-border: var(--border);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-green: var(--accent-green);
+  --color-accent-purple: var(--accent-purple);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, pre, .mono { font-family: var(--font-mono); }
+  ::selection { background: rgba(75, 160, 250, 0.35); }
+}
+
+/* Signature card: rounded corners, subtle white border, neumorphic shadow */
+.neu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow:
+    0 2.842px 14.211px 0 rgba(0, 0, 0, 0.25),
+    0.711px 0.711px 0.711px 0 rgba(255, 255, 255, 0.10) inset;
+}
+
+/* Brand backdrop: blue dot grid faded at edges + soft top glow */
+.dot-grid {
+  position: relative;
+}
+.dot-grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      rgba(75, 160, 250, 0.08) 0%,
+      rgba(34, 97, 202, 0.04) 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at center,
+      rgba(105, 167, 240, 0.18) 1px,
+      transparent 1px
+    );
+  background-size: 100% 100%, 32px 32px;
+  -webkit-mask-image:
+    radial-gradient(ellipse at center, black 55%, transparent 100%);
+          mask-image:
+    radial-gradient(ellipse at center, black 55%, transparent 100%);
+}
+
+/* Section labels — small caps like the brain-home widgets */
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Custom scrollbar tuned to the palette */
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
+.custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.1); border-radius: 999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.18); }

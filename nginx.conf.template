@@ -1,0 +1,31 @@
+# nginx-config voor het Supermemory-dashboard.
+# ${SUPERMEMORY_UPSTREAM} wordt bij het starten door de nginx-entrypoint
+# (envsubst) ingevuld; nginx-eigen variabelen als $host/$uri blijven staan.
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Bestanden tot 100 MB (de "Add memory"-file-upload gaat hierlangs)
+    client_max_body_size 100m;
+
+    # SPA-routing (HashRouter heeft dit niet nodig, maar het is veilig)
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Alles onder /api/ door naar supermemory; de trailing slash in proxy_pass
+    # stript de /api-prefix, zodat /api/v3/... -> <upstream>/v3/...
+    location /api/ {
+        proxy_pass ${SUPERMEMORY_UPSTREAM}/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Authorization $http_authorization;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}
